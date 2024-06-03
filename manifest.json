@@ -1,0 +1,23 @@
+{
+    "manifest_version": 3,
+    "name": "Troca de Fontes",
+    "version": "1.0",
+    "description": "Troque todas as fontes de um site por uma fonte do Google Fonts.",
+    "permissions": [
+        "activeTab",
+        "scripting",
+        "storage"
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "icon16.png",
+            "32": "icon32.png",
+            "48": "icon48.png",
+            "128": "icon128.png"
+        }
+    },
+    "background": {
+        "service_worker": "background.js"
+    }
+}
