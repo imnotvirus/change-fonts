@@ -34,9 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
           args: [selectedFont],
         });
 
-        chrome.storage.sync.set({ [tabs[0].url]: selectedFont }).then(() => {
-          console.log(`Font saved: ${selectedFont} for ${tabs[0].url}`);
-        });
+        saveFontToWebsite(tabs[0].url, selectedFont);
       });
     }
   });
@@ -49,12 +47,26 @@ document.addEventListener("DOMContentLoaded", function () {
         function: resetFontOnPage,
       });
 
-      chrome.storage.sync.remove(tabs[0].url).then(() => {
-        console.log(`Font removed for ${tabs[0].url}`);
+      const { host } = new URL(tabs[0].url);
+      chrome.storage.sync.remove(host, () => {
+        console.log(`Font removed for ${host}`);
       });
     });
   });
 });
+
+function saveFontToWebsite(url, font) {
+  const { host } = new URL(url);
+
+  chrome.storage.sync.set({ [host]: font }, () => {
+    if (chrome.runtime.lastError) {
+      console.error(`Error saving font: ${chrome.runtime.lastError}`);
+      return;
+    }
+
+    console.log(`Font saved: ${font} for ${host}`);
+  });
+}
 
 function applyFontToPage(fontFamily) {
   console.log(`Applying font to page: ${fontFamily}`);
@@ -67,11 +79,11 @@ function applyFontToPage(fontFamily) {
   document.head.appendChild(link);
 
   document.body.style.fontFamily = fontFamily;
+
   const elementosDeTexto = document.querySelectorAll(
     "p, h1, h2, h3, h4, h5, h6, span, a"
   );
 
-  // Itera sobre cada elemento de texto e define a fonte para Arial
   elementosDeTexto.forEach((elemento) => {
     elemento.style.fontFamily = fontFamily;
   });
@@ -86,7 +98,6 @@ function resetFontOnPage() {
   );
 
   elementosDeTexto.forEach((elemento) => {
-    elemento.style.fontFamily = '';
+    elemento.style.fontFamily = "";
   });
-
 }
